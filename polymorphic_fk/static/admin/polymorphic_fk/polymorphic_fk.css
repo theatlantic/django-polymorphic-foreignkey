@@ -1,0 +1,7 @@
+.vForeignKeyRawIdAdminField[data-choices] + .related-lookup + .grp-related-widget-tools {
+    display: none;
+}
+
+select + .vForeignKeyRawIdAdminField[data-choices] {
+    margin-left: 20px;
+}
