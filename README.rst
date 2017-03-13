@@ -1,3 +1,3 @@
-django-polymorphic-fk
-=====================
+django-polymorphic-foreignkey
+=============================
 
