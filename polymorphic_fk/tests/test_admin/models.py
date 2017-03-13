@@ -8,6 +8,7 @@ except ImportError:
 import django
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils import six
 
 from polymorphic.managers import PolymorphicManager
 from polymorphic.models import PolymorphicModel
@@ -53,7 +54,8 @@ class A(Base):
             manager_inheritance_from_future = True
 
     def __str__(self):
-        return "A(%s) <%s>" % (self.a_val, super(A, self).__unicode__())
+        text_method = '__str__' if six.PY3 else '__unicode__'
+        return "A(%s) <%s>" % (self.a_val, getattr(super(A, self), text_method)())
 
 
 @python_2_unicode_compatible
@@ -65,7 +67,8 @@ class B(Base):
             manager_inheritance_from_future = True
 
     def __str__(self):
-        return "B(%s) <%s>" % (self.b_val, super(B, self).__unicode__())
+        text_method = '__str__' if six.PY3 else '__unicode__'
+        return "B(%s) <%s>" % (self.b_val, getattr(super(B, self), text_method)())
 
 
 @python_2_unicode_compatible
@@ -77,7 +80,8 @@ class C(Base):
             manager_inheritance_from_future = True
 
     def __str__(self):
-        return "C(%s) <%s>" % (self.c_val, super(C, self).__unicode__())
+        text_method = '__str__' if six.PY3 else '__unicode__'
+        return "C(%s) <%s>" % (self.c_val, getattr(super(C, self), text_method)())
 
 
 @python_2_unicode_compatible
