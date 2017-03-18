@@ -11,13 +11,14 @@ matrix:
     - { python: 2.7, env: TOXENV=py27-dj110 }
     - { python: 3.6, env: TOXENV=py36-dj110 }
     - { python: 2.7, env: TOXENV=py27-dj110-grp }
-    - { python: 2.7, env: TOXENV=py27-dj111 }
-    - { python: 3.6, env: TOXENV=py36-dj111 }
-    - { python: 3.6, env: TOXENV=py36-dj20 }
-  allow_failures:
-    - env: TOXENV=py27-dj111
-    - env: TOXENV=py36-dj111
-    - env: TOXENV=py36-dj20
+    # not yet supported by django-polymorphic
+    # - { python: 2.7, env: TOXENV=py27-dj111 }
+    # - { python: 3.6, env: TOXENV=py36-dj111 }
+    # - { python: 3.6, env: TOXENV=py36-dj20 }
+  # allow_failures:
+  #   - env: TOXENV=py27-dj111
+  #   - env: TOXENV=py36-dj111
+  #   - env: TOXENV=py36-dj20
 
 install:
   - pip install tox 

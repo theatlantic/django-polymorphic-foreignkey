@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.db import models
 from django import forms
 
 from polymorphic.admin import (
@@ -48,13 +47,24 @@ class ItemAdmin(admin.ModelAdmin):
     fieldsets = [(None, {'fields': ['slug', 'fk']})]
 
 
+class ItemForm(forms.ModelForm):
+    position = forms.IntegerField(widget=forms.HiddenInput)
+
+    def has_changed(self):
+        # If only position has changed, mark the form as not having changed
+        if not self.changed_data:
+            return False
+        if self.changed_data == ['position']:
+            fields_to_check = set(self.fields) - {'position', 'group'}
+            return any(self[f].value() for f in fields_to_check)
+        return True
+
+
 class ItemInline(nested_admin.NestedStackedInline):
+    form = ItemForm
     model = Item
     fieldsets = [(None, {'fields': ['position', 'slug', 'fk']})]
     sortable_field_name = 'position'
-    formfield_overrides = {
-        models.PositiveIntegerField: {'widget': forms.HiddenInput},
-    }
     inline_classes = ['grp-open']
 
 

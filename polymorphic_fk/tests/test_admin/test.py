@@ -5,28 +5,27 @@ from selenium.webdriver.support.ui import Select
 
 from polymorphic_fk.tests.base import BasePolymorphicForeignKeyTestCase
 
-from .models import Base, A, B, C, Item, Group
+from .models import A, B, C, Item, Group
 
 
 class PolymorphicForeignKeyAdminTestCase(BasePolymorphicForeignKeyTestCase):
 
     def setUp(self):
         super(PolymorphicForeignKeyAdminTestCase, self).setUp()
+        self.group = Group.objects.create(slug='group')
         n = 0
         for i, model_cls in enumerate((A, B, C)):
             attr = model_cls.__name__.lower()
             for j in range(0, 3 - i):
-                model_cls.objects.create(slug="%s-%d" % (attr, n), **{
+                slug = "%s-%d" % (attr, n)
+                fk = model_cls.objects.create(slug=slug, **{
                     ("%s_val" % attr): ("%d" % j)})
+                Item.objects.create(
+                    position=n, group=self.group, slug="item-%s" % slug, fk=fk)
                 n += 1
 
     def test_group_contenttype_select_html(self):
-        group = Group.objects.create(slug='group')
-        for position in range(0, 6):
-            fk = Base.objects.get(slug__endswith="-%d" % position)
-            Item.objects.create(
-                position=position, group=group, slug="item-%s" % fk.slug, fk=fk)
-        self.load_admin(group)
+        self.load_admin(self.group)
         expected_html = """
         <select class="polymorphic-ctypes" id="id_item_set-0-fk_ctypes">
             <option value=""></option>
@@ -49,12 +48,7 @@ class PolymorphicForeignKeyAdminTestCase(BasePolymorphicForeignKeyTestCase):
         self.assertHTMLEqual(expected_html, actual_html)
 
     def test_changelist_url(self):
-        group = Group.objects.create(slug='group')
-        for position in range(0, 6):
-            fk = Base.objects.get(slug__endswith="-%d" % position)
-            Item.objects.create(
-                position=position, group=group, slug="item-%s" % fk.slug, fk=fk)
-        self.load_admin(group)
+        self.load_admin(self.group)
         with self.clickable_selector('#lookup_id_item_set-0-fk') as el:
             lookup_link = el
         self.assertEqual(
@@ -62,14 +56,34 @@ class PolymorphicForeignKeyAdminTestCase(BasePolymorphicForeignKeyTestCase):
             "%s%s" % (self.live_server_url, A.get_admin_changelist_url()))
 
     def test_changelist_change_url(self):
-        group = Group.objects.create(slug='group')
-        for position in range(0, 6):
-            fk = Base.objects.get(slug__endswith="-%d" % position)
-            Item.objects.create(
-                position=position, group=group, slug="item-%s" % fk.slug, fk=fk)
-        self.load_admin(group)
+        self.load_admin(self.group)
         with self.clickable_selector('#id_item_set-0-fk_ctypes') as el:
             select = Select(el)
             select.select_by_visible_text('B')
         self.wait_until_available_selector(
-            '#lookup_id_item_set-0-fk[href="%s"]' %  B.get_admin_changelist_url())
+            '#lookup_id_item_set-0-fk[href="%s"]' % B.get_admin_changelist_url())
+
+    def test_load_admin(self):
+        self.load_admin(self.group)
+        a_obj_pk = "%d" % A.objects.get(slug='a-0').pk
+        with self.available_selector('#id_item_set-0-fk') as el:
+            val = self.selenium.execute_script("return arguments[0].value", el)
+        self.assertEqual(val, a_obj_pk)
+
+    def test_save_form(self):
+        b_obj = B.objects.get(slug='b-3')
+        self.load_admin(self.group)
+        with self.clickable_selector('#id_item_set-0-fk_ctypes') as el:
+            select = Select(el)
+            select.select_by_visible_text('B')
+        self.wait_until_available_selector(
+            '#lookup_id_item_set-0-fk[href="%s"]' % B.get_admin_changelist_url())
+        with self.available_selector('#id_item_set-0-fk') as el:
+            el.clear()
+            el.send_keys("%d" % b_obj.pk)
+        self.save_form()
+        item = self.group.item_set.all()[0]
+        self.assertEqual(item.fk, b_obj)
+        with self.available_selector('#id_item_set-0-fk') as el:
+            val = self.selenium.execute_script("return arguments[0].value", el)
+        self.assertEqual(val, "%d" % b_obj.pk)

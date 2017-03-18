@@ -38,7 +38,11 @@
                 $lookup.attr('href', $selected.data('changelistUrl'));
             }
             // Clear out the existing input value
-            $input.val('').trigger('change');
+            if (!$this.data('polymorphicFkInitialized')) {
+                $this.data('polymorphicFkInitialized', true);
+            } else {
+                $input.val('').trigger('change');
+            }
         });
         $select.insertBefore($input);
         $select.trigger('polymorphicfk:registered');
