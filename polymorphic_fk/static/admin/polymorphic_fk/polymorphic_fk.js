@@ -1,6 +1,7 @@
 (function($) {
     var registerFk = function(input) {
         var $input = $(input);
+        var inputName = $input.attr('name');
         var inputId = $input.attr('id');
         if (inputId.indexOf('__prefix__') >= 0) {
             return;
@@ -12,6 +13,7 @@
         }
         var $select = $('<select class="polymorphic-ctypes"/>')
             .attr('id', inputId + '_ctypes')
+            .attr('name', inputName + '_ctypes')
             .append($blank);
 
         $input.data('choices').forEach(function(choice) {
