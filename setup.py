@@ -17,7 +17,7 @@ def read(*parts):
 
 setup(
     name='django-polymorphic-foreignkey',
-    version='1.0.1',
+    version='1.0.2',
     license='BSD',
     description='A polymorphic ForeignKey field that acts like a generic ForeignKey',
     long_description=read('README.rst'),
