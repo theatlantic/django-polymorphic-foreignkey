@@ -2,38 +2,26 @@ from collections import OrderedDict
 import itertools
 import json
 
-import django
-from django.apps import apps
+import six
+
+from django import forms
 import django.contrib.admin
-try:
-    # Django 1.10
-    from django.urls import reverse
-except ImportError:
-    # Django <= 1.9
-    from django.core.urlresolvers import reverse
+from django.apps import apps
+from django.urls import reverse
+from django.conf import settings
 from django.contrib.admin.widgets import ForeignKeyRawIdWidget
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import ForeignKey, Count
-from django.utils import six
 
 import monkeybiz
 
 
 def compat_rel(f):
-    try:
-        # Django 1.9+
-        return f.remote_field
-    except AttributeError:
-        return f.rel
+    return f.remote_field
 
 
 def compat_rel_to(f):
-    try:
-        # Django 1.9+
-        return f.remote_field.model
-    except AttributeError:
-        # Django 1.8
-        return f.rel.to
+    return f.remote_field.model
 
 
 @monkeybiz.patch(django.contrib.admin.ModelAdmin)
@@ -57,9 +45,16 @@ def normalize_model(model):
 
 class PolymorphicForeignKeyRawIdWidget(ForeignKeyRawIdWidget):
 
-    class Media:
-        js = ['admin/polymorphic_fk/polymorphic_fk.js']
-        css = {'all': ['admin/polymorphic_fk/polymorphic_fk.css']}
+    @property
+    def media(self):
+        media = super(PolymorphicForeignKeyRawIdWidget, self).media
+        return media + forms.Media(
+            js=[
+                'admin/js/vendor/jquery/jquery{}.js'.format('' if settings.DEBUG else '.min'),
+                'admin/polymorphic_fk/polymorphic_fk.js',
+            ],
+            css={'all': ['admin/polymorphic_fk/polymorphic_fk.css']}
+        )
 
     def render(self, name, value, attrs=None):
         attrs = {} if attrs is None else attrs

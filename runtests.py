@@ -1,14 +1,21 @@
 #!/usr/bin/env python
 import warnings
-import django_admin_testutils
+import selenosis
 
 
 def main():
     warnings.simplefilter("error", Warning)
     warnings.filterwarnings("ignore", module="polymorphic")
     warnings.filterwarnings("ignore", "use_for_related_fields")
-    runtests = django_admin_testutils.RunTests(
-        "polymorphic_fk.tests.settings", "polymorphic_fk")
+
+    # Introduced in Python 3.7
+    warnings.filterwarnings(
+        'ignore',
+        category=DeprecationWarning,
+        message="Using or importing the ABCs from 'collections' instead of from 'collections.abc'",
+    )
+
+    runtests = selenosis.RunTests("polymorphic_fk.tests.settings", "polymorphic_fk")
     runtests()
 
 

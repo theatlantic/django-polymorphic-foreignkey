@@ -26,6 +26,13 @@
             }
             $select.append($option);
         });
+        $select.data('previousValue', $select.val());
+
+        // Bind to the focus event to store the previous value
+        $select.on("focus", function(evt) {
+            $select.data('previousValue', $select.val());
+        });
+
         $select.on('change', function() {
             var $this = $(this);
             var $selected = $this.find('option:selected');
@@ -42,8 +49,10 @@
             // Clear out the existing input value
             if (!$this.data('polymorphicFkInitialized')) {
                 $this.data('polymorphicFkInitialized', true);
-            } else {
+            } else if ($this.data('previousValue') !== $this.val()) {
+                // Clear out the existing input value if the content-type has changed
                 $input.val('').trigger('change');
+                $this.data('previousValue', $this.val());
             }
         });
         $select.insertBefore($input);
