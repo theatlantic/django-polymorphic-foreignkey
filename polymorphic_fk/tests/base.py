@@ -3,13 +3,13 @@ from __future__ import absolute_import
 import json
 import logging
 
-from django_admin_testutils import AdminSeleniumTestCase
+from selenosis import AdminSelenosisTestCase
 
 
 logger = logging.getLogger(__name__)
 
 
-class BasePolymorphicForeignKeyTestCase(AdminSeleniumTestCase):
+class BasePolymorphicForeignKeyTestCase(AdminSelenosisTestCase):
 
     root_urlconf = 'polymorphic_fk.tests.urls'
 

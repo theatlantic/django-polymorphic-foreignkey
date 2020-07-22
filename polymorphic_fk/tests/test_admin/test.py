@@ -1,10 +1,9 @@
-from django.contrib.contenttypes.models import ContentType
-from django.utils.six.moves import range
+from six.moves import range
 
+from django.contrib.contenttypes.models import ContentType
 from selenium.webdriver.support.ui import Select
 
 from polymorphic_fk.tests.base import BasePolymorphicForeignKeyTestCase
-
 from .models import A, B, C, Item, Group
 
 
@@ -27,7 +26,7 @@ class PolymorphicForeignKeyAdminTestCase(BasePolymorphicForeignKeyTestCase):
     def test_group_contenttype_select_html(self):
         self.load_admin(self.group)
         expected_html = """
-        <select class="polymorphic-ctypes" id="id_item_set-0-fk_ctypes">
+        <select class="polymorphic-ctypes" id="id_item_set-0-fk_ctypes" name="item_set-0-fk_ctypes">
             <option value=""></option>
             <option value="%(a_ctype)s" data-changelist-url="%(a_url)s"
                     selected="selected">A</option>

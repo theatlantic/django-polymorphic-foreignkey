@@ -1,14 +1,8 @@
-try:
-    # Django 1.10
-    from django.urls import reverse
-except ImportError:
-    # Django <= 1.9
-    from django.core.urlresolvers import reverse
+import six
 
 import django
+from django.urls import reverse
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils import six
 
 from polymorphic.managers import PolymorphicManager
 from polymorphic.models import PolymorphicModel
@@ -32,25 +26,25 @@ class AdminLinkMixin(object):
         return reverse("admin:%s_%s_change" % info, args=[self.pk])
 
 
-@python_2_unicode_compatible
+@six.python_2_unicode_compatible
 class Base(AdminLinkMixin, PolymorphicModel):
     slug = models.SlugField()
     objects = PolymorphicManager()
 
-    class Meta:
-        if django.VERSION > (1, 10):
+    if django.VERSION < (2, 0):
+        class Meta:
             manager_inheritance_from_future = True
 
     def __str__(self):
         return "Base %s" % self.slug
 
 
-@python_2_unicode_compatible
+@six.python_2_unicode_compatible
 class A(Base):
     a_val = models.CharField(max_length=32)
 
-    class Meta:
-        if django.VERSION > (1, 10):
+    if django.VERSION < (2, 0):
+        class Meta:
             manager_inheritance_from_future = True
 
     def __str__(self):
@@ -58,12 +52,12 @@ class A(Base):
         return "A(%s) <%s>" % (self.a_val, getattr(super(A, self), text_method)())
 
 
-@python_2_unicode_compatible
+@six.python_2_unicode_compatible
 class B(Base):
     b_val = models.CharField(max_length=32)
 
-    class Meta:
-        if django.VERSION > (1, 10):
+    if django.VERSION < (2, 0):
+        class Meta:
             manager_inheritance_from_future = True
 
     def __str__(self):
@@ -71,12 +65,12 @@ class B(Base):
         return "B(%s) <%s>" % (self.b_val, getattr(super(B, self), text_method)())
 
 
-@python_2_unicode_compatible
+@six.python_2_unicode_compatible
 class C(Base):
     c_val = models.CharField(max_length=32)
 
-    class Meta:
-        if django.VERSION > (1, 10):
+    if django.VERSION < (2, 0):
+        class Meta:
             manager_inheritance_from_future = True
 
     def __str__(self):
@@ -84,7 +78,7 @@ class C(Base):
         return "C(%s) <%s>" % (self.c_val, getattr(super(C, self), text_method)())
 
 
-@python_2_unicode_compatible
+@six.python_2_unicode_compatible
 class Group(AdminLinkMixin, models.Model):
     slug = models.SlugField()
 
@@ -92,7 +86,7 @@ class Group(AdminLinkMixin, models.Model):
         return "Group(%s)" % self.slug
 
 
-@python_2_unicode_compatible
+@six.python_2_unicode_compatible
 class Item(AdminLinkMixin, models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
     slug = models.SlugField()

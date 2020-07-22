@@ -1,7 +1,8 @@
+import sys
 import glob
 import os
 
-from django_admin_testutils.settings import *
+from selenosis.settings import *
 
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -23,3 +24,6 @@ LOGGING['loggers']['polymorphic_fk.tests'] = {
     'handlers': ['console'],
     'level': 'WARNING',
 }
+
+if 'runtests.py' not in sys.argv:
+    DATABASES['default']['NAME'] = 'db.sqlite3'
