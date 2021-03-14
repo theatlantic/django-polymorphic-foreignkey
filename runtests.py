@@ -8,6 +8,20 @@ def main():
     warnings.filterwarnings("ignore", module="polymorphic")
     warnings.filterwarnings("ignore", "use_for_related_fields")
 
+    try:
+        from django.utils.deprecation import RemovedInDjango40Warning
+    except ImportError:
+        pass
+    else:
+        warnings.filterwarnings("ignore", category=RemovedInDjango40Warning)
+
+    try:
+        from django.utils.deprecation import RemovedInDjango41Warning
+    except ImportError:
+        pass
+    else:
+        warnings.filterwarnings("ignore", category=RemovedInDjango41Warning)
+
     # Introduced in Python 3.7
     warnings.filterwarnings(
         'ignore',
